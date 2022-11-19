@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using apidemo.Models.Enum;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace apidemo.Entities
@@ -13,8 +14,11 @@ namespace apidemo.Entities
         [Required]
         public string Email { get; set; }
         public string? LastName { get; set; }
-        public string Password { get; set; }        
-        public ICollection<Contact>? Contacts {get; set;}
+        public string Password { get; set; }
+        public ICollection<Contact>? Contacts { get; set; }
+
+        public State State { get; set; } = State.Active;
+        public Rol Rol { get; set; } = Rol.User;
 
     }
 }

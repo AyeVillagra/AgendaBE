@@ -23,19 +23,40 @@ namespace apidemo.Controllers
         public IActionResult GetAll()
         {
 
-            return Ok(_userRepository.GetAllUsers());
+            return Ok(_userRepository.GetAll());
 
         }
         [HttpGet]
         [Route("GetOne/{Id}")]
         public IActionResult GetOneById(int Id)
         {
-            List<User> usersToReturn = _userRepository.GetAllUsers();
+            List<User> usersToReturn = _userRepository.GetAll();
             usersToReturn.Where(x => x.Id == Id).ToList();
             if (usersToReturn.Count > 0)
                 return Ok(usersToReturn);
             return NotFound("usuario inexistente");
 
+        }
+
+        [HttpDelete]
+        public IActionResult DeleteUser(int id)
+        {
+            try
+            {
+                if (_userRepository.GetById(id).Name == "Admin")
+                {
+                    _userRepository.Delete(id);
+                }
+                else
+                {
+                    _userRepository.Archive(id);
+                }
+                return StatusCode(204);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         

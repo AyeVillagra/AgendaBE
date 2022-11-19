@@ -1,58 +1,62 @@
-﻿using apidemo.DTOs;
+﻿using apidemo.Data.Repository.Interfaces;
+using apidemo.DTOs;
 using apidemo.Entities;
+using apidemo.Models.Enum;
+using AutoMapper;
+
 
 namespace apidemo.Data.Repository
 {
-    public class UserRepository
+    public class UserRepository : IUserRepository
+
     {
-        public static List<User> FakeUsers = new List<User>()
-        {
-            new User()
-            {
-                Email = "asasju@hsyso.com",
-                Name = "Pablo",
-                Password = "passwordsegura",
-                Id = 1
-            },
-            new User()
-            {
-                Email = "juytgsju@hsyso.com",
-                Name = "Aye",
-                Password = "passwordinsegura",
-                Id=2
-            }
+        private AgendaApiContext _context;
+        private readonly IMapper _mapper;
 
-        };
-
-        public List<User> GetAllUsers()
+        public UserRepository(AgendaApiContext context, IMapper mapper)
         {
-            return FakeUsers;
+            _context = context;
+            _mapper = mapper;
+        }
+        public User? GetById(int userId)
+        {
+            return _context.Users.SingleOrDefault(u => u.Id == userId);
         }
 
-        public User? GetOne(int ID)
+        public User? ValidarUsuario(AuthenticationRequestBody authRequestBody)
         {
-            return FakeUsers.SingleOrDefault(x => x.Id == ID);
-        }
-        public bool CreateUser(UserForCreationDTO userDTO)
-        {
-            User user = new User()
-            {
-                Name = userDTO.Name,
-                Password = userDTO.Password,
-                Id = userDTO.Id,
-                Email = userDTO.Email,
-            };
-            FakeUsers.Add(user);
-            return true;
+            return _context.Users.FirstOrDefault(p => p.UserName == authRequestBody.UserName && p.Password == authRequestBody.Password);
         }
 
-        public User ValidarUsuario(string userName, string password) {
-            var userActual = FakeUsers.Single(u => u.UserName == userName);
-            if (userActual.Password == password)
-            {
-                return userActual;
-            }
-            return userActual;
+        public List<User> GetAll()
+        {
+            return _context.Users.ToList();
         }
+
+        public void Create(CreateAndUpdateUserDto dto)
+        {
+            _context.Users.Add(_mapper.Map<User>(dto));
+        }
+
+        public void Update(CreateAndUpdateUserDto dto)
+        {
+            _context.Users.Update(_mapper.Map<User>(dto));
+        }
+
+        public void Delete(int id)
+        {
+            _context.Users.Remove(_context.Users.Single(u => u.Id == id));
+        }
+
+        public void Archive(int id)
+        {
+            User user = _context.Users.FirstOrDefault(u => u.Id == id);
+            if (user != null)
+            {
+                user.state = State.Archived;
+                _context.Update(user);
+            }            
+        }
+       
     }
 }

@@ -6,8 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Text.Json.Serialization;
-
-
+using apidemo.Data.Repository.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +31,9 @@ builder.Services.AddCors(options =>
             builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
         });
 });
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 
 var app = builder.Build();
 

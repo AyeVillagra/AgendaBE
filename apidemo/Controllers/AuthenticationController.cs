@@ -1,31 +1,31 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using apidemo.Data.Repository;
-using apidemo.DTOs;
-using apidemo.Entities;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using apidemo.DTOs;
+using apidemo.Data.Repository.Interfaces;
 
 namespace apidemo.Controllers
 {
-    public class AuthenticationController : Controller
+    [Route("api/authentication")]
+    [ApiController]
+    public class AuthenticationController : ControllerBase
     {
         private readonly IConfiguration _config;
-        private readonly UserRepository _userRepository;
+        private readonly IUserRepository _userRepository;
 
-        public AuthenticationController(UserRepository userRepository, IConfiguration config,)
+        public AuthenticationController(UserRepository userRepository, IConfiguration config)
         {
             _config = config; //Hacemos la inyección para poder usar el appsettings.json
-            _userRepository = userRepository;
+            this._userRepository = userRepository;
         }
 
-        [HttpPost("authenticate")]
         public ActionResult Authenticate(AuthenticationRequestBody requetestBody)
         {
            {
-                var user = _userRepository.ValidarUsuario(requetestBody.UserName, requetestBody.Password);
+                var user = _userRepository.ValidarUsuario(requetestBody);
                 if (user != null)
                 {
                     var securityPassword = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_config["Authentication:SecretForKey"])); //Traemos la SecretKey del Json. agregar antes: using Microsoft.IdentityModel.Tokens;
@@ -37,6 +37,7 @@ namespace apidemo.Controllers
                     claimsForToken.Add(new Claim("sub", user.Id.ToString())); //"sub" es una key estándar que significa unique user identifier, es decir, si mandamos el id del usuario por convención lo hacemos con la key "sub".
                     claimsForToken.Add(new Claim("given_name", user.Name)); //Lo mismo para given_name y family_name, son las convenciones para nombre y apellido. Ustedes pueden usar lo que quieran, pero si alguien que no conoce la app
                     claimsForToken.Add(new Claim("family_name", user.LastName)); //quiere usar la API por lo general lo que espera es que se estén usando estas keys.
+                    claimsForToken.Add(new Claim("role", user.Rol.ToString()));
 
                     var jwtSecurityToken = new JwtSecurityToken( //agregar using System.IdentityModel.Tokens.Jwt; Acá es donde se crea el token con toda la data que le pasamos antes.
                       _config["Authentication:Issuer"],
