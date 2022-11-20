@@ -32,7 +32,7 @@ namespace apidemo.Data
                 Password = "Pa$$w0rd",
                 Email = "karenbailapiola@gmail.com",
                 UserName = "karenpiola",
-                Rol = Rol.Admin
+                Rol = Models.Enum.Rol.Admin
             };
             User luis = new User()
             {
@@ -42,7 +42,7 @@ namespace apidemo.Data
                 Password = "lamismadesiempre",
                 Email = "elluismidetotoras@gmail.com",
                 UserName = "luismitoto",
-                Rol = Rol.User
+                Rol = Models.Enum.Rol.User
             };
 
             Contact jaimitoC = new Contact()

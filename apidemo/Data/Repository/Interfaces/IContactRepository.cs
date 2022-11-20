@@ -11,4 +11,4 @@ namespace apidemo.Data.Repository.Interfaces
             public void Delete(int id);
         }
     }
-}
+

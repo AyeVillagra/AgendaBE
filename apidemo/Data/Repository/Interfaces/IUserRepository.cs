@@ -11,8 +11,7 @@ namespace apidemo.Data.Repository.Interfaces
         public List<User> GetAll();
         public void Create(CreateAndUpdateUserDto dto);
         public void Update(CreateAndUpdateUserDto dto);
-        public void Delete(int id);
-        void GetById(object rol);
+        public void Delete(int id);        
         void Archive(int id);
     }
 }

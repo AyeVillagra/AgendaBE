@@ -1,4 +1,4 @@
-using apidemo.Controllers;
+ï»¿using apidemo.Controllers;
 using apidemo.Data.Repository;
 using apidemo.Data;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +10,7 @@ using apidemo.Data.Repository.Interfaces;
 using AutoMapper;
 using apidemo.Profiles;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -17,22 +18,46 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-builder.Services.AddDbContext<AgendaApiContext>(dbContextOptions => dbContextOptions.UseSqlite(builder.Configuration["ConnectionStrings:AgendaAPIDBConnectionString"]));
-
-builder.Services.AddSingleton<UserRepository>();
-builder.Services.AddSingleton<ContactRepository>();
-
-builder.Services.AddCors(options =>
+builder.Services.AddSwaggerGen(setupAction =>
 {
-    options.AddPolicy(
-        name: "AllowOrigin",
-        builder =>
+    setupAction.AddSecurityDefinition("AgendaApiBearerAuth", new OpenApiSecurityScheme() //Esto va a permitir usar swagger con el token.
+    {
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        Description = "Acï¿½ pegar el token generado al loguearse."
+    });
+
+    setupAction.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
         {
-            builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
-        });
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "AgendaApiBearerAuth" } //Tiene que coincidir con el id seteado arriba en la definiciï¿½n
+                }, new List<string>() }
+    });
 });
+
+builder.Services.AddDbContext<AgendaApiContext>(dbContextOptions => dbContextOptions.UseSqlite(
+    builder.Configuration["ConnectionStrings:AgendaAPIDBConnectionString"]));
+
+builder.Services.AddAuthentication("Bearer") //"Bearer" es el tipo de auntenticaciï¿½n que tenemos que elegir despuï¿½s en PostMan para pasarle el token
+    .AddJwtBearer(options => //Acï¿½ definimos la configuraciï¿½n de la autenticaciï¿½n. le decimos quï¿½ cosas queremos comprobar. La fecha de expiraciï¿½n se valida por defecto.
+    {
+        options.TokenValidationParameters = new()
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Authentication:Issuer"],
+            ValidAudience = builder.Configuration["Authentication:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Authentication:SecretForKey"]))
+        };
+    }
+);
+
 
 var config = new MapperConfiguration(cfg =>
 {
@@ -41,10 +66,11 @@ var config = new MapperConfiguration(cfg =>
 });
 var mapper = config.CreateMapper();
 
+#region DependencyInjections
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-builder.Services.AddScoped<IUserRepository, UserRepository>(); // una de las formas de implementar la inyección de dependencias
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
-builder.Services.AddScoped<IMapper, Mapper>();
+#endregion
 
 var app = builder.Build();
 
@@ -55,8 +81,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
 app.UseHttpsRedirection();
-app.UseCors("AllowOrigin");
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

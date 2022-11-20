@@ -1,10 +1,8 @@
 ﻿using apidemo.Data.Repository.Interfaces;
 using apidemo.DTOs;
-using apidemo.Entities;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
+
 
 namespace apidemo.Controllers
 {
@@ -72,10 +70,12 @@ namespace apidemo.Controllers
         {
             try
             {
-                string role = HttpContext.User.FindFirst("role").Value;
+                var role = HttpContext.User.Claims.FirstOrDefault(x => x.Type.Contains("role"));
+                    if (role.Value == "Admin")
+                                    
                 // if(HttpContext.User.) es el lugar donde Microsoft guarda el Token cuando lo recibe
                 // HttpContext.User.Identity devuelve el Id del usuario (no sabe el tipo de dato)
-                if (role == "Admin")
+                
                 {
                     _userRepository.Delete(id);
                     

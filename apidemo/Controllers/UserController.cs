@@ -1,11 +1,9 @@
 ﻿using apidemo.Data.Repository;
 using apidemo.Data.Repository.Interfaces;
 using apidemo.DTOs;
-using apidemo.Entities;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
-using System.Text.Json;
+
 
 namespace apidemo.Controllers
 {
@@ -14,8 +12,8 @@ namespace apidemo.Controllers
 
     public class UserController : Controller
     {
-        private IUserRepository _userRepository;
-        private readonly IMapper _autoMapper;
+        private readonly IUserRepository _userRepository;
+        //private readonly IMapper _autoMapper;
 
         public UserController(IUserRepository userRepository)
         {
