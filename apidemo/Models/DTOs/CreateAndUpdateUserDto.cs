@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using apidemo.Models.Enum;
+using System.ComponentModel.DataAnnotations;
 
 namespace apidemo.DTOs
 {
@@ -11,5 +12,6 @@ namespace apidemo.DTOs
         public string Email { get; set; }
         [Required]
         public string UserName { get; set; }
+        public Rol Rol { get; set; } = Rol.User;
     }
 }

@@ -72,15 +72,28 @@ namespace apidemo.Controllers
         {
             try
             {
-                _userRepository.GetById(User.Identity.Rol);
+                string role = HttpContext.User.FindFirst("role").Value;
+                // if(HttpContext.User.) es el lugar donde Microsoft guarda el Token cuando lo recibe
+                // HttpContext.User.Identity devuelve el Id del usuario (no sabe el tipo de dato)
+                if (role == "Admin")
+                {
+                    _userRepository.Delete(id);
+                    
+                }
+                else
+                {
+                    _userRepository.Archive(id);                   
+                }
+                return NoContent();
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex);
             }
             return Ok();
         }
 
+ 
 
 
 

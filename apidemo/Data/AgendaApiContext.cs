@@ -1,5 +1,7 @@
 ﻿using apidemo.Entities;
+using apidemo.Models.Enum;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 // todo lo que va en el contexto son instrucciones que le doy al ORM para que cuando corro la
 //aplicación, el ORM mapee mis entidades a tablas. 
@@ -11,8 +13,8 @@ namespace apidemo.Data
     public class AgendaApiContext : DbContext
     {
         // especifico las entidades que van a ser tablas
-        public DbSet<User> Users { get; set; } 
-        public DbSet<Contact> Contacts { get; set; } 
+        public DbSet<User> Users { get; set; }
+        public DbSet<Contact> Contacts { get; set; }
 
         // constructor
         public AgendaApiContext(DbContextOptions<AgendaApiContext> options) : base(options)// indica que llama al constructor de la clase padre o base
@@ -24,45 +26,75 @@ namespace apidemo.Data
         {
             User karen = new User()
             {
-                Email = "asasju@hsyso.com",
+                Id = 1,
                 Name = "Karen",
-                Password = "passwordsegura",
-                Id = 1
+                LastName = "Lasot",
+                Password = "Pa$$w0rd",
+                Email = "karenbailapiola@gmail.com",
+                UserName = "karenpiola",
+                Rol = Rol.Admin
             };
             User luis = new User()
             {
-                Email = "juytgsju@hsyso.com",
-                Name = "Luis",
-                Password = "passwordinsegura",
-                Id = 2
+                Id = 2,
+                Name = "Luis Gonzalez",
+                LastName = "Gonzales",
+                Password = "lamismadesiempre",
+                Email = "elluismidetotoras@gmail.com",
+                UserName = "luismitoto",
+                Rol = Rol.User
             };
-
 
             Contact jaimitoC = new Contact()
             {
-                Name = "Jaimito",
-                CelularNumber = 3452692,
                 Id = 1,
-                Description = "plomero",
+                Name = "Jaimito",
+                CelularNumber = 341457896,
+                Description = "Plomero",
+                TelephoneNumber = null,
                 UserId = karen.Id
+                
             };
+
             Contact pepeC = new Contact()
             {
-                Name = "Pedro",
-                TelephoneNumber = 24516790,
-                Description = "Hermano",
                 Id = 2,
-                UserId = luis.Id
+                Name = "Pepe",
+                CelularNumber = 34156978,
+                Description = "Papa",
+                TelephoneNumber = 422568,
+                UserId = luis.Id,
             };
 
-            modelBuilder.Entity<Contact>().HasData(jaimitoC, pepeC);
-            modelBuilder.Entity<User>().HasData(karen, luis);
+            Contact mariaC = new Contact()
+            {
+                Id = 3,
+                Name = "Maria",
+                CelularNumber = 011425789,
+                Description = "Jefa",
+                TelephoneNumber = null,
+                UserId = karen.Id,
+            };
 
-            //tabla de la relación. Un usuario tiene muchos contactos en el elemento Contacts
-            // con un contacto en User
-            modelBuilder.Entity<User>().HasMany<Contact>(u => u.Contacts).WithOne(c => c.User);
+            modelBuilder.Entity<User>().HasData(
+                karen, luis);
+
+            modelBuilder.Entity<Contact>().HasData(
+                 jaimitoC, pepeC, mariaC
+                 );
+
+            ////tabla de la relación. Un usuario tiene muchos contactos en el elemento Contacts
+            //// con un contacto en User
+
+            modelBuilder.Entity<User>()
+              .HasMany<Contact>(u => u.Contacts)
+              .WithOne(c => c.User);
 
             base.OnModelCreating(modelBuilder);
         }
     }
-}
+}   
+
+            
+           
+   

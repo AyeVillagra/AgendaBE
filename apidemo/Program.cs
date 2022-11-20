@@ -7,6 +7,8 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Text.Json.Serialization;
 using apidemo.Data.Repository.Interfaces;
+using AutoMapper;
+using apidemo.Profiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,8 +34,17 @@ builder.Services.AddCors(options =>
         });
 });
 
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+var config = new MapperConfiguration(cfg =>
+{
+    cfg.AddProfile(new ContactProfile());
+    cfg.AddProfile(new UserProfile());
+});
+var mapper = config.CreateMapper();
 
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddScoped<IUserRepository, UserRepository>(); // una de las formas de implementar la inyección de dependencias
+builder.Services.AddScoped<IContactRepository, ContactRepository>();
+builder.Services.AddScoped<IMapper, Mapper>();
 
 var app = builder.Build();
 

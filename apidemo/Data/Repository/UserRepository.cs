@@ -53,7 +53,7 @@ namespace apidemo.Data.Repository
             User user = _context.Users.FirstOrDefault(u => u.Id == id);
             if (user != null)
             {
-                user.state = State.Archived;
+                user.State = State.Archived;
                 _context.Update(user);
             }            
         }

@@ -1,7 +1,10 @@
 ﻿using apidemo.Data.Repository;
+using apidemo.Data.Repository.Interfaces;
 using apidemo.DTOs;
 using apidemo.Entities;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 
 namespace apidemo.Controllers
@@ -11,11 +14,12 @@ namespace apidemo.Controllers
 
     public class UserController : Controller
     {
-        private UserRepository _userRepository { get; set; }
-        public UserController(UserRepository userRepository)
+        private IUserRepository _userRepository;
+        private readonly IMapper _autoMapper;
+
+        public UserController(IUserRepository userRepository)
         {
             _userRepository = userRepository;
-
         }
 
         [HttpGet]
@@ -30,12 +34,29 @@ namespace apidemo.Controllers
         [Route("GetOne/{Id}")]
         public IActionResult GetOneById(int Id)
         {
-            List<User> usersToReturn = _userRepository.GetAll();
-            usersToReturn.Where(x => x.Id == Id).ToList();
-            if (usersToReturn.Count > 0)
-                return Ok(usersToReturn);
-            return NotFound("usuario inexistente");
+            try
+            {
+                return Ok(_userRepository.GetById(Id));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
+        }
+
+        [HttpPost]
+        public IActionResult CreateUser(CreateAndUpdateUserDto dto)
+        {
+            try
+            {
+                _userRepository.Create(dto);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+            return Created("Created", dto);
         }
 
         [HttpDelete]
@@ -43,23 +64,30 @@ namespace apidemo.Controllers
         {
             try
             {
-                if (_userRepository.GetById(id).Name == "Admin")
-                {
-                    _userRepository.Delete(id);
-                }
-                else
-                {
-                    _userRepository.Archive(id);
-                }
-                return StatusCode(204);
+                _userRepository.Delete(id);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
+            return Ok();
         }
 
-        
+        [HttpPut]
+        public IActionResult UpdateUser(CreateAndUpdateUserDto dto)
+        {
+            try
+            {
+                _userRepository.Update(dto);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+            return NoContent();
+        }
+
+
     }
 
 }

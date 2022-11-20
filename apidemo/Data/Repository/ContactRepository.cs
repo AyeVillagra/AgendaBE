@@ -1,11 +1,21 @@
-﻿using apidemo.DTOs;
+﻿using apidemo.Data.Repository.Interfaces;
+using apidemo.DTOs;
 using apidemo.Entities;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
 namespace apidemo.Data.Repository
 {
-    public class ContactRepository
+    public class ContactRepository : IContactRepository
     {
+        private readonly AgendaApiContext _context;
+        private readonly IMapper _mapper;
+
+        public ContactRepository(AgendaApiContext context, IMapper mapper)
+        {
+            _context = context;
+            _mapper = mapper;
+        }
 
         public static List<Contact> Fakecontacts = new List<Contact>()
             {
@@ -23,9 +33,9 @@ namespace apidemo.Data.Repository
                 Id = 2
             }
             };
-        public List<Contact> GetAllContacts()
+        public List<Contact> GetAll()
         {
-            return Fakecontacts;
+            return _context.Contacts.ToList();
         }
         public void Create(CreateAndUpdateContact dto)
         {
@@ -40,6 +50,7 @@ namespace apidemo.Data.Repository
         {
             _context.Contacts.Remove(_context.Contacts.Single(c => c.Id == id));
         }
+
 
     }
 }
