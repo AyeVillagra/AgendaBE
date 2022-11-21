@@ -68,7 +68,7 @@ var mapper = config.CreateMapper();
 
 #region DependencyInjections
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>(); // si aparece tal interfaz, me lleve a tal clase
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
 #endregion
 
